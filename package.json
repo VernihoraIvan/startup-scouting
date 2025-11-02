@@ -1,0 +1,35 @@
+{
+  "name": "startup-scouting",
+  "version": "1.0.0",
+  "description": "You should build a command line tool that automates the startup scouting process for identifying potential partnership candidates. This tool leverages Large Language Models (LLMs) to analyze startup profiles against specific challenge requirements and answer custom evaluation questions, streamlining the initial screening process that typically requires manual research.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "startup-scout": "dist/index.js"
+  },
+  "scripts": {
+    "start": "npm run build && node dist/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VernihoraIvan/startup-scouting.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VernihoraIvan/startup-scouting/issues"
+  },
+  "homepage": "https://github.com/VernihoraIvan/startup-scouting#readme",
+  "dependencies": {
+    "commander": "^14.0.2",
+    "ollama": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
