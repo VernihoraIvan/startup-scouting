@@ -2,6 +2,8 @@
 
 import { Command } from 'commander';
 import { handleCommand } from './llm.js';
+import { parseChallenge } from './utils.js';
+import type { CommandOptions } from './types.js';
 
 const program = new Command();
 
@@ -11,7 +13,7 @@ program
   .requiredOption('-c, --challenge-file <path>', 'Path to the challenge file')
   .requiredOption('-d, --companies-db <path>', 'Path to the companies database file')
   .requiredOption('-q, --query <string>', 'The query to ask the LLM')
-  .action(async (options) => {
+  .action(async (options: CommandOptions) => {
     // We are just logging the parsed options for now, as requested.
     console.log('Parsed options:');
     console.log({
@@ -19,10 +21,13 @@ program
       companiesDb: options.companiesDb,
       query: options.query,
     });
+    console.log(''); // Add a newline for better readability
     
-    // The existing handleCommand function can be adapted later.
-    // For now, we will create a prompt from the query.
-    await handleCommand(options.query);
+    // 1. Parse the challenge file to get the criteria.
+    const challengeContent = parseChallenge(options.challengeFile);
+    
+    // 2. Pass the options and criteria to the handler to process companies.
+    await handleCommand(options, challengeContent);
   });
 
 (async () => {
