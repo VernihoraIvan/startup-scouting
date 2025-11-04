@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import 'dotenv/config';
 import { Command } from 'commander';
 import { handleCommand } from './llm.js';
 import { parseChallenge } from './utils.js';
