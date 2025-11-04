@@ -1,9 +1,3 @@
-export interface MatchedCompany {
-  domain: string;
-  description: string;
-  name: string;
-}
-
 export interface Company {
   address: string | null;
   description: string;
@@ -12,6 +6,10 @@ export interface Company {
   name: string;
   title: string;
 }
+
+export type MatchedCompanyWithAnswer = Company & {
+  answer: string;
+};
 
 export interface CommandOptions {
   challengeFile: string;

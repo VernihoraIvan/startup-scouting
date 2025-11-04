@@ -14,14 +14,6 @@ program
   .requiredOption('-d, --companies-db <path>', 'Path to the companies database file')
   .requiredOption('-q, --query <string>', 'The query to ask the LLM')
   .action(async (options: CommandOptions) => {
-    // We are just logging the parsed options for now, as requested.
-    console.log('Parsed options:');
-    console.log({
-      challengeFile: options.challengeFile,
-      companiesDb: options.companiesDb,
-      query: options.query,
-    });
-    console.log(''); // Add a newline for better readability
     
     // 1. Parse the challenge file to get the criteria.
     const challengeContent = parseChallenge(options.challengeFile);
