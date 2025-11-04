@@ -1,6 +1,6 @@
 import { createAnswerPrompt, createMatchingPrompt, systemPrompt, systemPromptAnswer } from './prompts.js';
 import type { Company, CommandOptions, MatchedCompanyWithAnswer } from './types.js';
-import { parseCompaniesDb, printResult } from './utils.js';
+import { parseCompaniesDb, printResult, generateExport } from './utils.js';
 import { processAICall } from './ai-utils.js';
 import { BATCH_SIZE } from './constants.js';
 
@@ -72,6 +72,7 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
     console.log('\n--- Analysis Complete ---');
     if (companiesWithAnswers.length > 0) {
       printResult(companiesWithAnswers, options.query);
+      generateExport(companiesWithAnswers, options.query);
     } else {
       console.log('No matching companies were found in the entire dataset.');
     }

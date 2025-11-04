@@ -10,6 +10,7 @@ Your job is to:
 - Return only startups that clearly match (≥90% relevance).
 - If none match, return an empty JSON array [].
 - Output must be a single valid JSON array — no text, comments, or explanations before or after.
+- You MUST RETURN ONLY 1 MATCH.
 `;
 
 export const systemPromptAnswer = `
