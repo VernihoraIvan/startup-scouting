@@ -81,6 +81,7 @@ Return structured JSON output:
 - Keep scoring scale consistent regardless of how many chunks are processed.
 - If the challenge defines two "tracks" (e.g., practice vs. moonshot), include both in the parsed criteria list.
 - Normalize all scores to 0-100 range for consistency.
+- Choose not more than 3 startups to match the challenge.
 
 ---
 

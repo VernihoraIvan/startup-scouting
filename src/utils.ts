@@ -11,8 +11,6 @@ function writeExport(filePath: string, fileContent: string): void {
   }
 }
 
-
-
 export function generateExport(matchedCompanies: MatchedCompanyWithAnswer[], query: string): string {
   const basePath = 'export';
   const baseName = 'result';
@@ -103,3 +101,25 @@ export function printResult(matchedCompanies: MatchedCompanyWithAnswer[], query:
   export const isAllENVVariablesPresent = () => {
     return process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GOOGLE_CLOUD_API_KEY;
   }
+
+let loaderInterval: NodeJS.Timeout | null = null;
+
+export function startThinkingLoader(text = 'thinking') {
+  let i = 0;
+  const dots = ['   ', '.  ', '.. ', '...'];
+  process.stdout.write(`${text}`);
+  loaderInterval = setInterval(() => {
+    process.stdout.write(`\r${text}${dots[i % dots.length]} `);
+    i++;
+  }, 400);
+}
+
+export function stopThinkingLoader() {
+  if (loaderInterval) {
+    clearInterval(loaderInterval);
+    loaderInterval = null;
+    process.stdout.write('\r');
+    process.stdout.write(' '.repeat(50)); // clear line
+    process.stdout.write('\r'); // Move back to start
+  }
+}

@@ -1,6 +1,6 @@
 import { createAnswerPrompt, createMatchingPrompt, systemPrompt, systemPromptAnswer } from './prompts.js';
 import type { Company, CommandOptions, MatchedCompanyWithAnswer } from './types.js';
-import { parseCompaniesDb, printResult, generateExport } from './utils.js';
+import { parseCompaniesDb, printResult, generateExport, startThinkingLoader, stopThinkingLoader } from './utils.js';
 import { processAICall } from './ai-utils.js';
 import { BATCH_SIZE, MODEL_NOT_FOUND_ERROR } from './constants.js';
 
@@ -27,7 +27,12 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
 
       let response;
       try {
-        response = await processAICall(prompt, systemPrompt, !!options.localLlm);
+        startThinkingLoader('Thinking (matching batch)');
+        try {
+          response = await processAICall(prompt, systemPrompt, !!options.localLlm);
+        } finally {
+          stopThinkingLoader();
+        }
         if (response instanceof Error && response.message === MODEL_NOT_FOUND_ERROR) {
           return ;
         }
@@ -37,8 +42,13 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
       }
       
       try {
-        if (response.matches && Array.isArray(response.matches) && response.matches.length > 0) {
+        if (response.matches && Array.isArray(response.matches)) {
           allMatchingCompanies.push(...response.matches);
+        } else if (Array.isArray(response)) {
+          allMatchingCompanies.push(...response);
+        } else {
+          console.warn(`Warning: Could not parse LLM response for batch ${batchNumber}. Response was:\n${response}`);
+          continue;
         }
       } catch (e) {
         console.warn(`Warning: Could not parse LLM response for batch ${batchNumber}. Response was:\n${response}`);
@@ -57,14 +67,26 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
 
       const answerPrompt = createAnswerPrompt(company, options.query);
 
-      const answerResponse = await processAICall(answerPrompt, systemPromptAnswer, !!options.localLlm);
+      let answerResponse;
+      try {
+        startThinkingLoader('Thinking (answering)');
+        try {
+          answerResponse = await processAICall(answerPrompt, systemPromptAnswer, !!options.localLlm);
+        } finally {
+          console.log('stopThinkingLoader');
+          stopThinkingLoader();
+        }
+      } catch (e) {
+        console.warn(`\nWarning: Could not process answer for ${company.name}. Error: ${e}`);
+        continue;
+      }
 
       try {
         if (answerResponse) {
           companiesWithAnswers.push(answerResponse);
         }
       } catch (e) {
-         console.warn(`\nWarning: Could not parse answer for ${company.name}. Response was:\n${answerResponse.response}`);
+         console.warn(`\nWarning: Could not parse answer for ${company.name}. Response was:\n${answerResponse?.response}`);
          continue;
       }
     }
