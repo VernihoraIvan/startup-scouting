@@ -96,15 +96,10 @@ export function printResult(matchedCompanies: MatchedCompanyWithAnswer[], query:
   export const getENVVariables = () => {
     return {
       googleCloudProjectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-      privateKey: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.replace(
-        /\\n/g,
-        "\n"
-      ) || '',
-      clientEmail: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
       API_KEY: process.env.GOOGLE_CLOUD_API_KEY,
     };
   }
 
   export const isAllENVVariablesPresent = () => {
-    return process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GOOGLE_CLOUD_PRIVATE_KEY && process.env.GOOGLE_CLOUD_CLIENT_EMAIL && process.env.GOOGLE_CLOUD_API_KEY;
+    return process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GOOGLE_CLOUD_API_KEY;
   }

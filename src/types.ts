@@ -15,4 +15,5 @@ export interface CommandOptions {
   challengeFile: string;
   companiesDb: string;
   query: string;
+  localLlm?: boolean;
 }

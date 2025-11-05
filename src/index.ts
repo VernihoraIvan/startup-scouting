@@ -14,11 +14,12 @@ program
   .requiredOption('-c, --challenge-file <path>', 'Path to the challenge file')
   .requiredOption('-d, --companies-db <path>', 'Path to the companies database file')
   .requiredOption('-q, --query <string>', 'The query to ask the LLM')
+  .option('-l, --local-llm', 'Use local LLM')
   .action(async (options: CommandOptions) => {
     
     // 1. Parse the challenge file to get the criteria.
     const challengeContent = parseChallenge(options.challengeFile);
-    
+
     // 2. Pass the options and criteria to the handler to process companies.
     await handleCommand(options, challengeContent);
   });

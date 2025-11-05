@@ -131,21 +131,22 @@ export function createMatchingPrompt(challengeContent: string, batch: Company[])
   }
 
 
-export function createAnswerPrompt(matchedCompanies: Company[], query: string): string {
+export function createAnswerPrompt(matchedCompany: Company, query: string): string {
     const prompt = `
   You will be given:
-  - A list of startups that match the challenge.
+  - A startup that matches the challenge.
   - The user's query.
   
-  Startups that match the challenge:
-  ${JSON.stringify(matchedCompanies, null, 2)}
-
+  Startup that matches the challenge:
+  ${JSON.stringify(matchedCompany, null, 2)}
+  
+  The user's query: ${query}
+  
   Your goal:
-  - Answer the user's query based on each startup that matches the challenge. 
-  - Return the initial list of matched startups with the same structure but add "answer" property.
-  - Do not remove any matched startup from the initial list.
+  - Answer the user's query based on a single startup that matches the challenge. 
+  - Return the startup with the same structure but add "answer" property.
 
-  Return ONLY a valid JSON array. Each item must include:
+  Return ONLY a valid JSON. Must include:
   {
     "name": "Startup name",
     "domain": "Startup domain",
@@ -155,13 +156,10 @@ export function createAnswerPrompt(matchedCompanies: Company[], query: string): 
   }
 
    ### Rules
-  - call the array "matches"
-  - If no startup matches, output exactly: { "matches": [] }
-  - Do not invent companies.
-  - Do not change the order of the startups in the initial list.
   - Do not include text outside the JSON.
+  - Do not invent companies or properties.
+  - If you cannot answer the user's query, just put N/A for the answer.
 
-  User query: ${query}
   `;
     return prompt;
   }

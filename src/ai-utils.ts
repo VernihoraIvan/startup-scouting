@@ -1,16 +1,33 @@
 import ollama from "ollama";
-import { LLM_MODEL_GEMINI_2_5_FLASH_LITE, LLM_MODEL_LLAMA3_8B } from "./constants.js";
+import { LLM_MODEL_DEEPSEEK_R1, LLM_MODEL_GEMINI_2_5_FLASH_LITE, LLM_MODEL_LLAMA3_8B, MODEL_NOT_FOUND_ERROR } from "./constants.js";
 import { getENVVariables, isAllENVVariablesPresent } from "./utils.js";
 
 async function callLocalLLM(prompt: string, systemPrompt: string) {
-  const response = await ollama.generate({
-    model: LLM_MODEL_LLAMA3_8B,
-    system: systemPrompt,
-    prompt: prompt,
-    stream: false,
-    format: "json",
-  });
-
+  let response;
+  const model : [string, string] = [ LLM_MODEL_LLAMA3_8B, LLM_MODEL_DEEPSEEK_R1];
+  try {
+     response = await ollama.generate({
+      model: model[0],
+      system: systemPrompt,
+      prompt: prompt,
+      stream: false,
+      format: "json",
+    });
+  } catch (error) {
+    console.error("Error calling local LLM (", model[0], "). Continuing with ", model[1], "...");
+    try {
+      response = await ollama.generate({
+        model: model[1],
+        system: systemPrompt,
+        prompt: prompt,
+        stream: false,
+        format: "json",
+      });
+    } catch (error) {
+      console.error("Error calling local LLM (", model[0], ", ", model[1], "). Please pull the model and try again.");
+      return new Error(MODEL_NOT_FOUND_ERROR);
+    }
+  }
   return JSON.parse(response.response);
 }
 
@@ -74,8 +91,8 @@ async function callGoogleCloudLLM(prompt: string, systemPrompt: string) {
     }
 }
 
-export async function processAICall(prompt: string, systemPrompt: string) {
-  if (!isAllENVVariablesPresent()) {
+export async function processAICall(prompt: string, systemPrompt: string, localLLM: boolean) {
+  if (!isAllENVVariablesPresent() || localLLM) {
     console.log("Using Ollama API");
     return await callLocalLLM(prompt, systemPrompt);
   } else {

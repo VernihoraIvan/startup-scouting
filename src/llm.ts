@@ -2,7 +2,7 @@ import { createAnswerPrompt, createMatchingPrompt, systemPrompt, systemPromptAns
 import type { Company, CommandOptions, MatchedCompanyWithAnswer } from './types.js';
 import { parseCompaniesDb, printResult, generateExport } from './utils.js';
 import { processAICall } from './ai-utils.js';
-import { BATCH_SIZE } from './constants.js';
+import { BATCH_SIZE, MODEL_NOT_FOUND_ERROR } from './constants.js';
 
 async function handleCommand(options: CommandOptions, challengeContent: string) {
   const startTime = Date.now();
@@ -11,9 +11,7 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
   const allMatchingCompanies: Company[] = [];
 
   try {
-    
     // 2. Initialize an array to accumulate all matching companies.
-
     let batchSize = BATCH_SIZE;
     if (allCompanies.length < batchSize) {
       batchSize = allCompanies.length;
@@ -29,7 +27,10 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
 
       let response;
       try {
-        response = await processAICall(prompt, systemPrompt);
+        response = await processAICall(prompt, systemPrompt, !!options.localLlm);
+        if (response instanceof Error && response.message === MODEL_NOT_FOUND_ERROR) {
+          return ;
+        }
       } catch (e) {
         console.warn(`Warning: Could not process AI call for batch ${batchNumber}. Error: ${e}`);
         continue;
@@ -54,13 +55,13 @@ async function handleCommand(options: CommandOptions, challengeContent: string) 
       if (!company) continue;
       console.log(`Processing company ${i + 1} of ${allMatchingCompanies.length}: ${company.name}`);
 
-      const answerPrompt = createAnswerPrompt([company], options.query);
+      const answerPrompt = createAnswerPrompt(company, options.query);
 
-      const answerResponse = await processAICall(answerPrompt, systemPromptAnswer);
+      const answerResponse = await processAICall(answerPrompt, systemPromptAnswer, !!options.localLlm);
 
       try {
-        if (answerResponse.matches && Array.isArray(answerResponse.matches) && answerResponse.matches.length > 0) {
-          companiesWithAnswers.push(answerResponse.matches[0]);
+        if (answerResponse) {
+          companiesWithAnswers.push(answerResponse);
         }
       } catch (e) {
          console.warn(`\nWarning: Could not parse answer for ${company.name}. Response was:\n${answerResponse.response}`);
