@@ -93,10 +93,8 @@ async function callGoogleCloudLLM(prompt: string, systemPrompt: string) {
 
 export async function processAICall(prompt: string, systemPrompt: string, localLLM: boolean) {
   if (!isAllENVVariablesPresent() || localLLM) {
-    console.log("Using Ollama API");
     return await callLocalLLM(prompt, systemPrompt);
   } else {
-    console.log("Using Google Cloud API");
     return await callGoogleCloudLLM(prompt, systemPrompt);
   }
 }
